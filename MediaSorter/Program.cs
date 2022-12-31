@@ -1,22 +1,56 @@
 ﻿using CommandLine;
-using MetadataExtractor;
 using MediaSorter;
 using MediaSorter.Media;
 using Directory = System.IO.Directory;
 
 Parser.Default.ParseArguments<SorterOptions>(args)
-    .WithParsed<SorterOptions>(o =>
+    .WithParsed(options =>
     {
-        Console.WriteLine($"From {o.Source} to {o.Destination}");
-        var files = MediaLocator.GetMediaFilesRecursive(o.Source);
-        foreach (var file in files)
+        var actions = new List<string>();
+        if (!string.IsNullOrEmpty(options.Metadata))
         {
-            var fileName = Path.GetFileName(file);
-            var fileCreateDate = MediaDetailParser.GetCreatedDate(file);
-            var destination =
-                Path.Combine(o.Destination, fileCreateDate.Year.ToString(), fileCreateDate.Month.ToString());
-            Directory.CreateDirectory(destination);
-            File.Copy(file, Path.Combine(destination, fileName));
-            Console.WriteLine($"Copied {fileName}");
+            var metadata = MediaDetailParser.GetMetadata(options.Metadata);
+            actions.AddRange(metadata);
+        }
+        else
+        {
+            Console.WriteLine($"From {options.Source} to {options.Destination}");
+            var files = MediaLocator.GetMediaFilesRecursive(options.Source);
+            foreach (var file in files)
+            {
+                var fileDestination = MediaLocator.GetDestinationPath(options.Destination, file);
+                var sameLocation = file == fileDestination;
+                if (sameLocation) continue;
+                var fileExists = File.Exists(fileDestination);
+                if (!fileExists || options.Overwrite)
+                {
+                    if (!options.Simulate)
+                    {
+                        var destinationDirectory = Path.GetDirectoryName(fileDestination);
+                        if (!Directory.Exists(destinationDirectory))
+                        {
+                            Directory.CreateDirectory(destinationDirectory);
+                        }
+
+                        if (options.Move)
+                        {
+                            File.Move(file, fileDestination, options.Overwrite);
+                        }
+                        else
+                        {
+                            File.Copy(file, fileDestination, options.Overwrite);
+                        }
+                    }
+
+                    var action = $"{file} --> {fileDestination}";
+                    actions.Add(action);
+                    Console.WriteLine(action);
+                }
+            }
+        }
+
+        if (!string.IsNullOrEmpty(options.LogFilePath))
+        {
+            File.WriteAllLines(options.LogFilePath, actions);
         }
     });

@@ -8,7 +8,7 @@ public static class MediaLocator
             .Where(f => MediaFileExtensions.ImageExtensions.Contains(Path.GetExtension(f).ToLower()));
         foreach (var file in files)
         {
-            yield return file;
+            yield return Path.GetFullPath(file);
         }
     }
 
@@ -29,5 +29,15 @@ public static class MediaLocator
         {
             yield return mediaFile;
         }
+    }
+
+    public static string GetDestinationPath(string destination, string file)
+    {
+        var fileName = Path.GetFileName(file);
+        var fileCreationDate = MediaDetailParser.GetFileDate(file);
+        var destinationPath = Path.Combine(destination, 
+            fileCreationDate.ToString("yyyy/MM/dd"),
+            fileName);
+        return Path.GetFullPath(destinationPath);
     }
 }
