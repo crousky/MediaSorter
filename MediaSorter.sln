@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaSorter", "MediaSorter\MediaSorter.csproj", "{B17B6EF4-7829-4E81-84A5-244F189BD765}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B17B6EF4-7829-4E81-84A5-244F189BD765}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B17B6EF4-7829-4E81-84A5-244F189BD765}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B17B6EF4-7829-4E81-84A5-244F189BD765}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B17B6EF4-7829-4E81-84A5-244F189BD765}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
