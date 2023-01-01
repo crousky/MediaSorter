@@ -15,7 +15,8 @@ Parser.Default.ParseArguments<SorterOptions>(args)
         else
         {
             Console.WriteLine($"From {options.Source} to {options.Destination}");
-            var files = MediaLocator.GetMediaFilesRecursive(options.Source);
+            var files = MediaLocator.GetMediaFilesRecursive(options.Source, 
+                options.Extensions.Any() ? options.Extensions.ToList() : null);
             foreach (var file in files)
             {
                 var fileDestination = MediaLocator.GetDestinationPath(options.Destination, file);

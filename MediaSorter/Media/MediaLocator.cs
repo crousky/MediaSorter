@@ -2,29 +2,30 @@
 
 public static class MediaLocator
 {
-    public static IEnumerable<string> GetMediaFiles(string directoryPath)
+    public static IEnumerable<string> GetMediaFiles(string directoryPath, List<string>? extensions = null)
     {
+        var fileExtensions = extensions ?? MediaFileExtensions.ImageExtensions;
         var files = Directory.EnumerateFiles(directoryPath)
-            .Where(f => MediaFileExtensions.ImageExtensions.Contains(Path.GetExtension(f).ToLower()));
+            .Where(f => fileExtensions.Contains(Path.GetExtension(f).ToLower()));
         foreach (var file in files)
         {
             yield return Path.GetFullPath(file);
         }
     }
 
-    public static IEnumerable<string> GetMediaFilesRecursive(string directoryPath)
+    public static IEnumerable<string> GetMediaFilesRecursive(string directoryPath, List<string>? extensions = null)
     {
         var directories = Directory.GetDirectories(directoryPath);
         foreach (var directory in directories)
         {
-            var directoryFiles = GetMediaFilesRecursive(directory);
+            var directoryFiles = GetMediaFilesRecursive(directory, extensions);
             foreach (var directoryFile in directoryFiles)
             {
                 yield return directoryFile;
             }
         }
 
-        var mediaFiles = GetMediaFiles(directoryPath);
+        var mediaFiles = GetMediaFiles(directoryPath, extensions);
         foreach (var mediaFile in mediaFiles)
         {
             yield return mediaFile;

@@ -24,4 +24,7 @@ public class SorterOptions
     
     [Option("metadata", Required = false, HelpText = "Display metadata about a file")]
     public string Metadata { get; set; }
+    
+    [Option('e', "extensions", Required = false, HelpText = "File extensions to include separated by ','. Ex: .jpg,.png", Separator = ',')]
+    public IEnumerable<string> Extensions { get; set; } = new List<string>();
 }

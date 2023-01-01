@@ -8,13 +8,20 @@ public static class MediaDetailParser
 {
     public static DateTime GetFileDate(string filePath)
     {
-        var metadataDirectories = ImageMetadataReader.ReadMetadata(filePath);
-        var id0Directory = metadataDirectories.OfType<ExifIfd0Directory>().FirstOrDefault();
-        var dateTime = id0Directory?.GetDescription(ExifDirectoryBase.TagDateTime);
-        var subIfdDirectory = metadataDirectories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
-        var dateTimeOriginal = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
-        var parsedDateTime = GetMin(ParseExifDateTime(dateTime), ParseExifDateTime(dateTimeOriginal));
-        if (parsedDateTime.HasValue) return parsedDateTime.Value;
+        try
+        {
+            var metadataDirectories = ImageMetadataReader.ReadMetadata(filePath);
+            var id0Directory = metadataDirectories.OfType<ExifIfd0Directory>().FirstOrDefault();
+            var dateTime = id0Directory?.GetDescription(ExifDirectoryBase.TagDateTime);
+            var subIfdDirectory = metadataDirectories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
+            var dateTimeOriginal = subIfdDirectory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
+            var parsedDateTime = GetMin(ParseExifDateTime(dateTime), ParseExifDateTime(dateTimeOriginal));
+            if (parsedDateTime.HasValue) return parsedDateTime.Value;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR [GetFileData]{filePath} -- {ex.Message}");
+        }
         var fileInfo = new FileInfo(filePath);
         return GetMin(GetMin(fileInfo.CreationTime, fileInfo.LastWriteTime), fileInfo.LastAccessTime);
     }
