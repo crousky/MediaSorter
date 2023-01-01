@@ -14,39 +14,48 @@ Parser.Default.ParseArguments<SorterOptions>(args)
         }
         else
         {
-            Console.WriteLine($"From {options.Source} to {options.Destination}");
-            var files = MediaLocator.GetMediaFilesRecursive(options.Source, 
+            if (options.Simulate) Console.WriteLine("*** Using simulation mode - no changes will be made ***");
+            Console.WriteLine($"{(options.Move ? "Moving" : "Copying")} from {options.Source} to {options.Destination}");
+            var filePaths = MediaLocator.GetMediaFilesRecursive(options.Source, 
                 options.Extensions.Any() ? options.Extensions.ToList() : null);
-            foreach (var file in files)
+            var mediaFiles = new List<MediaFile>();
+            foreach (var filePath in filePaths)
             {
-                var fileDestination = MediaLocator.GetDestinationPath(options.Destination, file);
-                var sameLocation = file == fileDestination;
-                if (sameLocation) continue;
-                var fileExists = File.Exists(fileDestination);
-                if (!fileExists || options.Overwrite)
+                var mediaFile = new MediaFile(filePath) { DestinationPath = MediaLocator.GetDestinationPath(options.Destination, filePath, options.DestinationFormat) };
+                if (filePath == mediaFile.DestinationPath)
                 {
-                    if (!options.Simulate)
+                    mediaFile.ActionRequired = false;
+                }
+                else if (File.Exists(mediaFile.DestinationPath) && !options.Overwrite)
+                {
+                    mediaFile.ActionRequired = false;
+                }
+                mediaFiles.Add(mediaFile);
+            }
+            Console.WriteLine($"Found {mediaFiles.Count} in the source directory, {mediaFiles.Count(m => m.ActionRequired)} will be {(options.Move ? "moved" : "copied")}");
+            foreach (var file in mediaFiles.Where(f => f.ActionRequired))
+            {
+                if (!options.Simulate)
+                {
+                    var destinationDirectory = Path.GetDirectoryName(file.DestinationPath);
+                    if (!Directory.Exists(destinationDirectory))
                     {
-                        var destinationDirectory = Path.GetDirectoryName(fileDestination);
-                        if (!Directory.Exists(destinationDirectory))
-                        {
-                            Directory.CreateDirectory(destinationDirectory);
-                        }
-
-                        if (options.Move)
-                        {
-                            File.Move(file, fileDestination, options.Overwrite);
-                        }
-                        else
-                        {
-                            File.Copy(file, fileDestination, options.Overwrite);
-                        }
+                        Directory.CreateDirectory(destinationDirectory);
                     }
 
-                    var action = $"{file} --> {fileDestination}";
-                    actions.Add(action);
-                    Console.WriteLine(action);
+                    if (options.Move)
+                    {
+                        File.Move(file.FilePath, file.DestinationPath, options.Overwrite);
+                    }
+                    else
+                    {
+                        File.Copy(file.FilePath, file.DestinationPath, options.Overwrite);
+                    }
                 }
+
+                var action = $"{(options.Move ? "Moved" : "Copied")} {file.FilePath} --> {file.DestinationPath}";
+                actions.Add(action);
+                Console.WriteLine(action);
             }
         }
 

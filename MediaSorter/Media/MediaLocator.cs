@@ -32,12 +32,12 @@ public static class MediaLocator
         }
     }
 
-    public static string GetDestinationPath(string destination, string file)
+    public static string GetDestinationPath(string destination, string file, string destinationFormat = "yyyy/MM/dd")
     {
         var fileName = Path.GetFileName(file);
         var fileCreationDate = MediaDetailParser.GetFileDate(file);
         var destinationPath = Path.Combine(destination, 
-            fileCreationDate.ToString("yyyy/MM/dd"),
+            fileCreationDate.ToString(destinationFormat),
             fileName);
         return Path.GetFullPath(destinationPath);
     }

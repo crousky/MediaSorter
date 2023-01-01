@@ -10,6 +10,9 @@ public class SorterOptions
     [Option('d', "destination", Required = true, HelpText = "Destination directory for photos")]
     public string Destination { get; set; } = "";
     
+    [Option("destination-format", Required = false, HelpText = "DateTime ToString format used for the destination folder structure. Default value: yyyy/MM/dd")]
+    public string DestinationFormat { get; set; } = "yyyy/MM/dd";
+    
     [Option('m', "move", Required = false, HelpText = "Move files instead of copy")]
     public bool Move { get; set; }
     
